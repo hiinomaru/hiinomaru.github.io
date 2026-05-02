@@ -569,44 +569,47 @@ function drawImage() {
 
 function showBBox() {
   const item = dataset[current];
-  const t = window.t;
 
+  // просто перерисовать базовое изображение
   drawImage();
 
-  const w = currentImage.naturalWidth;
-  const h = currentImage.naturalHeight;
+  const imgW = currentImage.naturalWidth;
+  const imgH = currentImage.naturalHeight;
 
-  ctx.save();
+  const canvasW = canvas.width;
+  const canvasH = canvas.height;
 
-  // точно так же как image
-  const rotatedW = h;
-  const rotatedH = w;
+  const rotatedW = imgH;
+  const rotatedH = imgW;
 
-  const scale = t.scale;
+  const scale = Math.min(canvasW / rotatedW, canvasH / rotatedH);
 
   const drawW = rotatedW * scale;
   const drawH = rotatedH * scale;
 
-  const offsetX = (canvas.width - drawW) / 2;
-  const offsetY = (canvas.height - drawH) / 2;
+  const offsetX = (canvasW - drawW) / 2;
+  const offsetY = (canvasH - drawH) / 2;
+
+  ctx.save();
 
   ctx.translate(offsetX, offsetY);
-
   ctx.translate(drawW / 2, drawH / 2);
   ctx.rotate(Math.PI / 2);
 
   item.bboxes.forEach(box => {
-    const b = convertBBox(box, w, h, scale);
+    const x = (box.x * imgW - box.w * imgW / 2);
+    const y = (box.y * imgH - box.h * imgH / 2);
+    const bw = box.w * imgW;
+    const bh = box.h * imgH;
 
     ctx.strokeStyle = classColors[box.class_id] || "red";
     ctx.lineWidth = 3;
 
-    ctx.strokeRect(b.x, b.y, b.w, b.h);
+    ctx.strokeRect(-imgW/2 + y, -imgH/2 + x, bh, bw);
   });
 
   ctx.restore();
 }
-
 function next() {
   current = (current + 1) % dataset.length;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
