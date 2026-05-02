@@ -585,22 +585,34 @@ function showBBox() {
 
   ctx.save();
 
-  // SAME transform as image
+  // 1. применяем EXACT same transform как для изображения
   ctx.translate(transform.offsetX, transform.offsetY);
   ctx.translate(transform.drawW / 2, transform.drawH / 2);
   ctx.rotate(Math.PI / 2);
 
   item.bboxes.forEach(box => {
-    const b = transformBBox(box, imgW, imgH);
+
+    // YOLO → pixel coords
+    let x = box.x * imgW;
+    let y = box.y * imgH;
+    let w = box.w * imgW;
+    let h = box.h * imgH;
+
+    // 2. rotate bbox (90° clockwise)
+    const rx = y - h / 2;
+    const ry = imgW - x - w / 2;
+
+    const rw = h;
+    const rh = w;
 
     ctx.strokeStyle = classColors[box.class_id] || "red";
     ctx.lineWidth = 3;
 
     ctx.strokeRect(
-      -imgW / 2 + b.x,
-      -imgH / 2 + b.y,
-      b.w,
-      b.h
+      rx - imgH / 2,
+      ry - imgW / 2,
+      rw,
+      rh
     );
   });
 
