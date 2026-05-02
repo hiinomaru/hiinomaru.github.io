@@ -574,6 +574,14 @@ function transformBBox(box, imgW, imgH) {
   };
 }
 
+function rotatePoint90(x, y, w, h) {
+  // rotate clockwise 90° around origin (0,0)
+  return {
+    x: y,
+    y: w - x
+  };
+}
+
 function showBBox() {
   if (!currentImage) return;
 
@@ -585,32 +593,37 @@ function showBBox() {
 
   ctx.save();
 
-  // 1. применяем EXACT same transform как для изображения
+  // same transform as image
   ctx.translate(transform.offsetX, transform.offsetY);
   ctx.translate(transform.drawW / 2, transform.drawH / 2);
   ctx.rotate(Math.PI / 2);
 
   item.bboxes.forEach(box => {
 
-    // YOLO → pixel coords
+    // YOLO → pixels
     let x = box.x * imgW;
     let y = box.y * imgH;
     let w = box.w * imgW;
     let h = box.h * imgH;
 
-    // 2. rotate bbox (90° clockwise)
-    const rx = y - h / 2;
-    const ry = imgW - x - w / 2;
+    // bbox corners (center-based → corner)
+    let x1 = x - w / 2;
+    let y1 = y - h / 2;
 
+    // rotate both corners
+    let p = rotatePoint90(x1, y1, imgW, imgH);
+
+    // after rotation swap w/h
     const rw = h;
     const rh = w;
 
     ctx.strokeStyle = classColors[box.class_id] || "red";
     ctx.lineWidth = 3;
 
+    // IMPORTANT: draw in rotated space centered
     ctx.strokeRect(
-      rx - imgH / 2,
-      ry - imgW / 2,
+      p.x - imgH / 2,
+      p.y - imgW / 2,
       rw,
       rh
     );
