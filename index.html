@@ -209,34 +209,51 @@ button {
 <div class="section">
   <h2>Data Augmentation</h2>
 
-  <div class="grid">
+  <div style="display:flex; gap:30px; align-items:center; flex-wrap:wrap; margin-top:30px;">
 
-    <div class="card"><h3>RandomBrightnessContrast</h3></div>
-    <div class="card"><h3>CLAHE</h3></div>
-    <div class="card"><h3>GaussNoise</h3></div>
-    <div class="card"><h3>Rotate</h3></div>
+    <!-- IMAGE -->
+    <div style="flex:1; min-width:300px;">
+      <div class="image-box" style="height:300px;">
+        <img src="images/augmentation.png">
+      </div>
+    </div>
+
+    <!-- LIST -->
+    <div style="flex:1; min-width:250px;">
+      <div class="card">
+        <h3>Techniques</h3>
+        <ul style="line-height:2; font-size:16px; padding-left:20px;">
+          <li>RandomBrightnessContrast</li>
+          <li>CLAHE</li>
+          <li>GaussNoise</li>
+          <li>Rotate</li>
+        </ul>
+      </div>
+    </div>
 
   </div>
 </div>
-
 <!-- MODELS -->
 <div id="models" class="section">
   <h2>Models</h2>
 
-  <div class="grid">
+  <div class="grid" style="grid-template-columns: repeat(2, 1fr);">
 
     <div class="card">
       <h3>YOLOv8 (2023)</h3>
-      <p>Small object detection + high recall</p>
-      <p>Unified model: detection, segmentation, classification, pose, OBB</p>
-      <p>Real-time inference optimized</p>
+      <p><b>Strength:</b> small object detection + high recall</p>
+      <p><b>Key feature:</b> unified multi-task model (detection, segmentation, classification, pose estimation, OBB)</p>
+      <p><b>Optimization:</b> real-time inference and usability</p>
+      <p><b>Architecture:</b> anchor-free detection head + improved backbone</p>
     </div>
 
     <div class="card">
       <h3>YOLOv11 (2024)</h3>
-      <p>Higher precision + stable bounding boxes</p>
-      <p>More efficient feature extraction</p>
-      <p>Fewer parameters → lighter model</p>
+      <p><b>Strength:</b> higher precision and stable bounding boxes</p>
+      <p><b>Key improvement:</b> more efficient feature extraction</p>
+      <p><b>Performance:</b> faster processing</p>
+      <p><b>Efficiency:</b> fewer parameters → lighter model</p>
+      <p><b>Focus:</b> better accuracy at higher epochs</p>
     </div>
 
   </div>
@@ -286,27 +303,41 @@ new Chart(ctx, {
   type: 'bar',
   data: {
     labels: [
-      "Class 1","Class 2","Class 3","Class 4","Class 5",
-      "Class 6","Class 7","Class 8","Class 9"
+      "boneanomaly",
+      "bonelesion",
+      "foreignbody",
+      "fracture",
+      "metal",
+      "periostealreaction",
+      "pronatorsign",
+      "softtissue",
+      "text"
     ],
     datasets: [{
       label: "Number of samples",
-      data: [1200, 1800, 900, 1400, 1100, 1600, 1300, 1500, 700],
+      data: [276, 45, 8, 18090, 818, 3453, 567, 464, 23722],
       backgroundColor: "#3b82f6"
     }]
   },
   options: {
     responsive: true,
     plugins: {
-      legend: { labels: { color: "white" } }
+      legend: {
+        labels: {
+          color: "white"
+        }
+      }
     },
     scales: {
-      x: { ticks: { color: "white" } },
-      y: { ticks: { color: "white" } }
+      x: {
+        ticks: { color: "white" }
+      },
+      y: {
+        ticks: { color: "white" }
+      }
     }
   }
 });
 </script>
-
 </body>
 </html>
