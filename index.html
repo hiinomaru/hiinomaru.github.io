@@ -456,12 +456,13 @@ const classColors = {
 function loadImage() {
   const item = dataset[current];
 
-  img.src = "images/" + item.img.replace(".txt", ".png");
+  const image = new Image();
+  image.src = "images/" + item.img.replace(".txt", ".png");
 
-  img.onload = () => {
+  image.onload = () => {
 
-    const w = img.naturalWidth;
-    const h = img.naturalHeight;
+    const w = image.naturalWidth;
+    const h = image.naturalHeight;
 
     canvas.width = h;
     canvas.height = w;
@@ -469,7 +470,13 @@ function loadImage() {
     canvas.style.width = h + "px";
     canvas.style.height = w + "px";
 
-    img.style.display = "none"; // скрываем оригинал
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.save();
+    ctx.translate(canvas.width, 0);
+    ctx.rotate(Math.PI / 2);
+    ctx.drawImage(image, 0, 0, w, h);
+    ctx.restore();
   };
 }
 
