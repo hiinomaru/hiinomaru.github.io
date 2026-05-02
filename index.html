@@ -466,15 +466,6 @@ const dataset = [
 let current = 0;
 let currentImage = null;
 
-window.t = {
-  scale: 1,
-  drawW: 0,
-  drawH: 0,
-  offsetX: 0,
-  offsetY: 0
-};
-
-//const img = document.getElementById("img");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -482,6 +473,15 @@ const classColors = {
   3: "red",
   5: "yellow",
   7: "cyan"
+};
+
+// глобальный transform (чтобы bbox всегда совпадал с изображением)
+let transform = {
+  scale: 1,
+  drawW: 0,
+  drawH: 0,
+  offsetX: 0,
+  offsetY: 0
 };
 
 function loadImage() {
@@ -493,17 +493,30 @@ function loadImage() {
   image.onload = () => {
     currentImage = image;
 
-    const w = image.naturalWidth;
-    const h = image.naturalHeight;
-
     canvas.width = 1100;
     canvas.height = 700;
 
-    canvas.style.width = h + "px";
-    canvas.style.height = w + "px";
-
     drawImage();
   };
+}
+
+function computeTransform(imgW, imgH) {
+  const canvasW = canvas.width;
+  const canvasH = canvas.height;
+
+  // изображение повёрнуто на 90°
+  const rotatedW = imgH;
+  const rotatedH = imgW;
+
+  const scale = Math.min(canvasW / rotatedW, canvasH / rotatedH);
+
+  const drawW = rotatedW * scale;
+  const drawH = rotatedH * scale;
+
+  const offsetX = (canvasW - drawW) / 2;
+  const offsetY = (canvasH - drawH) / 2;
+
+  return { scale, drawW, drawH, offsetX, offsetY };
 }
 
 function drawImage() {
@@ -517,37 +530,20 @@ function drawImage() {
 
   ctx.clearRect(0, 0, canvasW, canvasH);
 
-  // 🔥 ВАЖНО: учитываем поворот
-  const rotatedW = imgH;
-  const rotatedH = imgW;
-
-  // 👉 fit by LONG side (contain)
-  const scale = Math.min(canvasW / rotatedW, canvasH / rotatedH);
-
-  const drawW = rotatedW * scale;
-  const drawH = rotatedH * scale;
-
-  const offsetX = (canvasW - drawW) / 2;
-  const offsetY = (canvasH - drawH) / 2;
-
-  window.t = {
-    scale,
-    drawW,
-    drawH,
-    offsetX,
-    offsetY
-  };
+  transform = computeTransform(imgW, imgH);
 
   ctx.save();
 
-  // центрируем
-  ctx.translate(offsetX, offsetY);
+  // move to center of canvas
+  ctx.translate(transform.offsetX, transform.offsetY);
 
-  // поворот
-  ctx.translate(drawW / 2, drawH / 2);
+  // center of rotated image
+  ctx.translate(transform.drawW / 2, transform.drawH / 2);
+
+  // rotate image
   ctx.rotate(Math.PI / 2);
 
-  // рисуем в исходных координатах
+  // draw image centered at origin
   ctx.drawImage(
     currentImage,
     -imgW / 2,
@@ -557,85 +553,64 @@ function drawImage() {
   );
 
   ctx.restore();
+}
 
-  window.transform = {
-    scale,
-    drawW,
-    drawH,
-    offsetX,
-    offsetY
+/**
+ * YOLO bbox → rotated canvas coordinates
+ */
+function transformBBox(box, imgW, imgH) {
+  // original pixel coords
+  let x = box.x * imgW;
+  let y = box.y * imgH;
+  let w = box.w * imgW;
+  let h = box.h * imgH;
+
+  // rotate 90° clockwise (same as image)
+  return {
+    x: y,
+    y: imgW - x - w,
+    w: h,
+    h: w
   };
 }
 
 function showBBox() {
-  const item = dataset[current];
+  if (!currentImage) return;
 
-  // просто перерисовать базовое изображение
   drawImage();
 
+  const item = dataset[current];
   const imgW = currentImage.naturalWidth;
   const imgH = currentImage.naturalHeight;
 
-  const canvasW = canvas.width;
-  const canvasH = canvas.height;
-
-  const rotatedW = imgH;
-  const rotatedH = imgW;
-
-  const scale = Math.min(canvasW / rotatedW, canvasH / rotatedH);
-
-  const drawW = rotatedW * scale;
-  const drawH = rotatedH * scale;
-
-  const offsetX = (canvasW - drawW) / 2;
-  const offsetY = (canvasH - drawH) / 2;
-
   ctx.save();
 
-  ctx.translate(offsetX, offsetY);
-  ctx.translate(drawW / 2, drawH / 2);
+  // SAME transform as image
+  ctx.translate(transform.offsetX, transform.offsetY);
+  ctx.translate(transform.drawW / 2, transform.drawH / 2);
   ctx.rotate(Math.PI / 2);
 
   item.bboxes.forEach(box => {
-    const x = (box.x * imgW - box.w * imgW / 2);
-    const y = (box.y * imgH - box.h * imgH / 2);
-    const bw = box.w * imgW;
-    const bh = box.h * imgH;
+    const b = transformBBox(box, imgW, imgH);
 
     ctx.strokeStyle = classColors[box.class_id] || "red";
     ctx.lineWidth = 3;
 
-    ctx.strokeRect(-imgW/2 + y, -imgH/2 + x, bh, bw);
+    ctx.strokeRect(
+      -imgW / 2 + b.x,
+      -imgH / 2 + b.y,
+      b.w,
+      b.h
+    );
   });
 
   ctx.restore();
 }
+
 function next() {
   current = (current + 1) % dataset.length;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   loadImage();
-}
-
-function convertBBox(box, w, h, scale) {
-
-  let x = box.x * w;
-  let y = box.y * h;
-  let bw = box.w * w;
-  let bh = box.h * h;
-
-  // scale
-  x *= scale;
-  y *= scale;
-  bw *= scale;
-  bh *= scale;
-
-  // rotate 90° (same as image)
-  return {
-    x: y,
-    y: (w * scale) - x - bw,
-    w: bh,
-    h: bw
-  };
 }
   
 /* CHART */
