@@ -466,6 +466,14 @@ const dataset = [
 let current = 0;
 let currentImage = null;
 
+window.t = {
+  scale: 1,
+  drawW: 0,
+  drawH: 0,
+  offsetX: 0,
+  offsetY: 0
+};
+
 //const img = document.getElementById("img");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -522,6 +530,14 @@ function drawImage() {
   const offsetX = (canvasW - drawW) / 2;
   const offsetY = (canvasH - drawH) / 2;
 
+  window.t = {
+    scale,
+    drawW,
+    drawH,
+    offsetX,
+    offsetY
+  };
+
   ctx.save();
 
   // центрируем
@@ -553,6 +569,7 @@ function drawImage() {
 
 function showBBox() {
   const item = dataset[current];
+  const t = window.t;
 
   drawImage();
 
@@ -560,11 +577,26 @@ function showBBox() {
   const h = currentImage.naturalHeight;
 
   ctx.save();
-  ctx.translate(canvas.width, 0);
+
+  // точно так же как image
+  const rotatedW = h;
+  const rotatedH = w;
+
+  const scale = t.scale;
+
+  const drawW = rotatedW * scale;
+  const drawH = rotatedH * scale;
+
+  const offsetX = (canvas.width - drawW) / 2;
+  const offsetY = (canvas.height - drawH) / 2;
+
+  ctx.translate(offsetX, offsetY);
+
+  ctx.translate(drawW / 2, drawH / 2);
   ctx.rotate(Math.PI / 2);
 
   item.bboxes.forEach(box => {
-    const b = convertBBox(box, w, h);
+    const b = convertBBox(box, w, h, scale);
 
     ctx.strokeStyle = classColors[box.class_id] || "red";
     ctx.lineWidth = 3;
@@ -581,19 +613,25 @@ function next() {
   loadImage();
 }
 
-function convertBBox(box, w, h) {
+function convertBBox(box, w, h, scale) {
 
-  const boxW = box.w * w;
-  const boxH = box.h * h;
+  let x = box.x * w;
+  let y = box.y * h;
+  let bw = box.w * w;
+  let bh = box.h * h;
 
-  const boxX = (box.x * w) - boxW / 2;
-  const boxY = (box.y * h) - boxH / 2;
+  // scale
+  x *= scale;
+  y *= scale;
+  bw *= scale;
+  bh *= scale;
 
+  // rotate 90° (same as image)
   return {
-    x: boxX,
-    y: boxY,
-    w: boxW,
-    h: boxH
+    x: y,
+    y: (w * scale) - x - bw,
+    w: bh,
+    h: bw
   };
 }
   
