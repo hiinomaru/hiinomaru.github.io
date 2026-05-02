@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <title>AI Fracture Detection</title>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 html { scroll-behavior: smooth; }
 
@@ -14,7 +16,7 @@ body {
   color: white;
 }
 
-/* NAVBAR */
+/* NAV */
 .nav {
   position: fixed;
   top: 0;
@@ -69,7 +71,7 @@ h1, h2, h3 {
 /* IMAGE BOX */
 .image-box {
   width: 100%;
-  height: 260px;
+  height: 240px;
   border-radius: 12px;
   overflow: hidden;
   margin-top: 15px;
@@ -85,15 +87,7 @@ h1, h2, h3 {
   object-fit: contain;
 }
 
-/* ROTATION */
-.rotate-90 {
-  transform: rotate(90deg);
-}
-
-/* =========================
-   🔥 NEW PIPELINE (CLEAN UI)
-   ========================= */
-
+/* PIPELINE */
 .pipeline {
   display: flex;
   justify-content: center;
@@ -109,13 +103,6 @@ h1, h2, h3 {
   border-radius: 12px;
   min-width: 130px;
   text-align: center;
-  transition: 0.3s;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-}
-
-.step:hover {
-  transform: translateY(-5px);
-  background: #273449;
 }
 
 .icon {
@@ -123,15 +110,17 @@ h1, h2, h3 {
   margin-bottom: 6px;
 }
 
-.label {
-  font-size: 14px;
-  font-weight: bold;
-  opacity: 0.9;
-}
-
 .arrow {
   font-size: 22px;
   opacity: 0.6;
+}
+
+/* CHART */
+.chart-container {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 30px;
 }
 
 /* BUTTONS */
@@ -152,27 +141,19 @@ button {
 
 /* RESPONSIVE */
 @media (max-width: 900px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .pipeline {
-    flex-direction: column;
-  }
-
-  .arrow {
-    transform: rotate(90deg);
-  }
+  .grid { grid-template-columns: 1fr; }
+  .pipeline { flex-direction: column; }
+  .arrow { transform: rotate(90deg); }
 }
 </style>
 </head>
 
 <body>
 
-<!-- NAV -->
 <div class="nav">
   <a href="#demo">Demo</a>
-  <a href="#why">Why</a>
+  <a href="#dataset">Dataset</a>
+  <a href="#models">Models</a>
   <a href="#how">How it works</a>
 </div>
 
@@ -192,25 +173,72 @@ button {
   <div class="result" id="result"></div>
 </div>
 
-<!-- WHY -->
-<div id="why" class="section">
-  <h2>Why it matters</h2>
+<!-- DATASET -->
+<div id="dataset" class="section">
+  <h2>Dataset Overview</h2>
 
   <div class="grid">
+
     <div class="card">
-      <h3>Problem</h3>
-      <p>Fractures are common and require fast diagnosis.</p>
+      <h3>Scale</h3>
+      <p>Images of 6091 patients</p>
+      <p>20,327 images (16.28 GB)</p>
     </div>
 
     <div class="card">
-      <h3>Solution</h3>
-      <p>AI helps doctors analyze X-rays faster.</p>
+      <h3>Projections</h3>
+      <p>Lateral + posteroanterior views</p>
     </div>
 
     <div class="card">
-      <h3>Impact</h3>
-      <p>Improves accessibility and reduces workload.</p>
+      <h3>Annotations</h3>
+      <p>Bounding boxes placed by radiologists</p>
+      <p>9 fracture classes</p>
     </div>
+
+  </div>
+
+  <!-- CHART -->
+  <div class="chart-container">
+    <h3>Class Distribution</h3>
+    <canvas id="classChart"></canvas>
+  </div>
+</div>
+
+<!-- AUGMENTATIONS -->
+<div class="section">
+  <h2>Data Augmentation</h2>
+
+  <div class="grid">
+
+    <div class="card"><h3>RandomBrightnessContrast</h3></div>
+    <div class="card"><h3>CLAHE</h3></div>
+    <div class="card"><h3>GaussNoise</h3></div>
+    <div class="card"><h3>Rotate</h3></div>
+
+  </div>
+</div>
+
+<!-- MODELS -->
+<div id="models" class="section">
+  <h2>Models</h2>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3>YOLOv8 (2023)</h3>
+      <p>Small object detection + high recall</p>
+      <p>Unified model: detection, segmentation, classification, pose, OBB</p>
+      <p>Real-time inference optimized</p>
+    </div>
+
+    <div class="card">
+      <h3>YOLOv11 (2024)</h3>
+      <p>Higher precision + stable bounding boxes</p>
+      <p>More efficient feature extraction</p>
+      <p>Fewer parameters → lighter model</p>
+    </div>
+
   </div>
 </div>
 
@@ -218,86 +246,18 @@ button {
 <div id="how" class="section">
   <h2>How it works</h2>
 
-  <!-- 🔥 NEW PIPELINE -->
   <div class="pipeline">
 
-    <div class="step">
-      <div class="icon">📷</div>
-      <div class="label">Image</div>
-    </div>
-
+    <div class="step"><div class="icon">📷</div>Image</div>
     <div class="arrow">→</div>
 
-    <div class="step">
-      <div class="icon">⚙️</div>
-      <div class="label">Processing</div>
-    </div>
-
+    <div class="step"><div class="icon">⚙️</div>Processing</div>
     <div class="arrow">→</div>
 
-    <div class="step">
-      <div class="icon">🤖</div>
-      <div class="label">Model</div>
-    </div>
-
+    <div class="step"><div class="icon">🤖</div>Model</div>
     <div class="arrow">→</div>
 
-    <div class="step">
-      <div class="icon">✅</div>
-      <div class="label">Result</div>
-    </div>
-
-  </div>
-
-  <div class="grid">
-
-    <div class="card">
-      <h3>Dataset</h3>
-      <p>GRAZPEDWRI-DX dataset with 20k+ annotated X-rays.</p>
-      <div class="image-box">
-        <img src="images/i7.png">
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>Preprocessing</h3>
-      <p>Augmentations improve robustness.</p>
-      <div class="image-box">
-        <img src="images/i2.png" class="rotate-90">
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>YOLOv8</h3>
-      <p>Fast and accurate detection.</p>
-      <div class="image-box">
-        <img src="images/i3.png">
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>YOLOv11</h3>
-      <p>Better recall for subtle fractures.</p>
-      <div class="image-box">
-        <img src="images/i4.png">
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>Confusion Matrix</h3>
-      <p>Model performance overview.</p>
-      <div class="image-box">
-        <img src="images/i5.png">
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>Precision-Recall</h3>
-      <p>Trade-off between precision and recall.</p>
-      <div class="image-box">
-        <img src="images/i6.png">
-      </div>
-    </div>
+    <div class="step"><div class="icon">✅</div>Result</div>
 
   </div>
 </div>
@@ -315,14 +275,37 @@ upload.onchange = () => {
 };
 
 function answer(userAnswer) {
-  const result = document.getElementById("result");
-
-  if (userAnswer === correctAnswer) {
-    result.innerHTML = "✅ Correct!";
-  } else {
-    result.innerHTML = "❌ AI says: " + correctAnswer;
-  }
+  document.getElementById("result").innerHTML =
+    userAnswer === correctAnswer ? "✅ Correct!" : "❌ AI says: fracture";
 }
+
+/* CHART */
+const ctx = document.getElementById('classChart');
+
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: [
+      "Class 1","Class 2","Class 3","Class 4","Class 5",
+      "Class 6","Class 7","Class 8","Class 9"
+    ],
+    datasets: [{
+      label: "Number of samples",
+      data: [1200, 1800, 900, 1400, 1100, 1600, 1300, 1500, 700],
+      backgroundColor: "#3b82f6"
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { labels: { color: "white" } }
+    },
+    scales: {
+      x: { ticks: { color: "white" } },
+      y: { ticks: { color: "white" } }
+    }
+  }
+});
 </script>
 
 </body>
