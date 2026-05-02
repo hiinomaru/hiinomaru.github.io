@@ -195,21 +195,27 @@ button {
 </div>
 
 <!-- DEMO -->
-<div id="demo" class="section">
-  <h1>Why</h1>
-  <p style="text-align:center;">Can you detect fractures better than AI?</p>
+<!-- WHY -->
+<div id="why" class="section">
+  <h1>Why it matters</h1>
 
-  <input type="file" id="upload">
-  <img id="preview" style="display:none; max-width:300px; margin:20px auto; display:block;">
+  <div class="cards">
+    <div class="card">
+      <h3>Problem</h3>
+      <p>Fractures are common and require fast diagnosis. Errors can affect patient outcomes.</p>
+    </div>
 
-  <div style="text-align:center;">
-    <button onclick="answer('fracture')">Fracture</button>
-    <button onclick="answer('no')">No Fracture</button>
+    <div class="card">
+      <h3>Solution</h3>
+      <p>AI helps doctors analyze X-rays faster and more consistently.</p>
+    </div>
+
+    <div class="card">
+      <h3>Impact</h3>
+      <p>Reduces workload and improves accessibility of medical diagnostics.</p>
+    </div>
   </div>
-
-  <div class="result" id="result"></div>
 </div>
-
 <!-- HOW -->
 <div id="how" class="section">
   <h1>How it works</h1>
