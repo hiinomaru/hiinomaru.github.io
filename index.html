@@ -459,8 +459,8 @@ function loadImage() {
   img.src = "images/" + item.img.replace(".txt", ".png");
 
   img.onload = () => {
-    canvas.width = img.clientWidth;
-    canvas.height = img.clientHeight;
+    canvas.width = img.clientHeight;
+    canvas.height = img.clientWidth;
   };
 }
 
@@ -471,7 +471,6 @@ function showBBox() {
 
   ctx.save();
 
-  // 👉 вращаем canvas
   ctx.translate(canvas.width, 0);
   ctx.rotate(Math.PI / 2);
 
