@@ -214,15 +214,15 @@ button {
   <h1>Bone Fracture Detection</h1>
   <p style="text-align:center;">Can you detect fractures better than AI?</p>
 
-  <input type="file" id="upload">
-  <img id="preview" style="display:none; max-width:300px; margin:20px auto; display:block;">
-
-  <div style="text-align:center;">
-    <button onclick="answer('fracture')">Fracture</button>
-    <button onclick="answer('no')">No Fracture</button>
+  <div style="position:relative; display:inline-block;">
+    <img id="img" style="max-width:500px;">
+    <canvas id="canvas" style="position:absolute; left:0; top:0;"></canvas>
   </div>
 
-  <div class="result" id="result"></div>
+  <div style="text-align:center; margin-top:20px;">
+    <button onclick="showBBox()">Show Answer</button>
+    <button onclick="next()">Next</button>
+  </div>
 </div>
 
 <!-- WHY -->
@@ -368,22 +368,141 @@ button {
 </div>
 
 <script>
-let correctAnswer = "fracture";
+const dataset = [
+  {
+    "img": "0008_1128992441_01_WRI-L2_M005.txt",
+    "bboxes": [
+      { "class_id": 3, "x": 0.367876, "y": 0.456878, "w": 0.233161, "h": 0.066594 }
+    ]
+  },
+  {
+    "img": "0014_0516192868_01_WRI-L2_M006.txt",
+    "bboxes": [
+      { "class_id": 3, "x": 0.407599, "y": 0.532115, "w": 0.148532, "h": 0.087945 },
+      { "class_id": 3, "x": 0.488774, "y": 0.534585, "w": 0.107081, "h": 0.088933 }
+    ]
+  },
+  {
+    "img": "0021_1009239893_01_WRI-R2_M015.txt",
+    "bboxes": [
+      { "class_id": 3, "x": 0.519093, "y": 0.504079, "w": 0.374702, "h": 0.085082 }
+    ]
+  },
+  {
+    "img": "0023_0657842010_02_WRI-L2_M012.txt",
+    "bboxes": [
+      { "class_id": 7, "x": 0.307531, "y": 0.320881, "w": 0.196653, "h": 0.204981 }
+    ]
+  },
+  {
+    "img": "0028_0579540510_04_WRI-R2_M008.txt",
+    "bboxes": [
+      { "class_id": 3, "x": 0.588517, "y": 0.548736, "w": 0.162679, "h": 0.124549 },
+      { "class_id": 5, "x": 0.525518, "y": 0.687274, "w": 0.100478, "h": 0.450361 }
+    ]
+  },
+  {
+    "img": "0033_1098977682_01_WRI-L2_F006.txt",
+    "bboxes": [
+      { "class_id": 3, "x": 0.432471, "y": 0.573442, "w": 0.244253, "h": 0.099407 },
+      { "class_id": 3, "x": 0.502874, "y": 0.575668, "w": 0.183908, "h": 0.089021 }
+    ]
+  },
+  {
+    "img": "0042_0760627960_02_WRI-R2_M013.txt",
+    "bboxes": [
+      { "class_id": 3, "x": 0.630713, "y": 0.468861, "w": 0.230347, "h": 0.060498 }
+    ]
+  },
+  {
+    "img": "0042_0762697180_03_WRI-R2_M013.txt",
+    "bboxes": [
+      { "class_id": 3, "x": 0.588133, "y": 0.605263, "w": 0.230366, "h": 0.099624 }
+    ]
+  },
+  {
+    "img": "0042_0827512771_04_WRI-R2_M015.txt",
+    "bboxes": [
+      { "class_id": 3, "x": 0.588285, "y": 0.562189, "w": 0.266553, "h": 0.063018 }
+    ]
+  },
+  {
+    "img": "0069_0503059409_02_WRI-L1_M013.txt",
+    "bboxes": [
+      { "class_id": 3, "x": 0.549096, "y": 0.768022, "w": 0.198966, "h": 0.062847 },
+      { "class_id": 3, "x": 0.271964, "y": 0.689002, "w": 0.138243, "h": 0.065619 }
+    ]
+  },
+  {
+    "img": "0071_0680563788_02_WRI-R2_F009.txt",
+    "bboxes": [
+      { "class_id": 3, "x": 0.632444, "y": 0.607547, "w": 0.213552, "h": 0.130189 }
+    ]
+  }
+]
 
-const upload = document.getElementById("upload");
-const preview = document.getElementById("preview");
+let current = 0;
 
-upload.onchange = () => {
-  const file = upload.files[0];
-  preview.src = URL.createObjectURL(file);
-  preview.style.display = "block";
+const img = document.getElementById("img");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const classColors = {
+  3: "red",
+  5: "yellow",
+  7: "cyan"
 };
 
-function answer(userAnswer) {
-  document.getElementById("result").innerHTML =
-    userAnswer === correctAnswer ? "✅ Correct!" : "❌ AI says: fracture";
+function loadImage() {
+  const item = dataset[current];
+
+  img.src = "images/" + item.img.replace(".txt", ".png");
+
+  img.onload = () => {
+    canvas.width = img.clientWidth;
+    canvas.height = img.clientHeight;
+  };
 }
 
+function showBBox() {
+  const item = dataset[current];
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  item.bboxes.forEach(box => {
+    const b = convertBBox(box, img);
+
+    ctx.strokeStyle = classColors[box.class_id] || "red";
+    ctx.lineWidth = 3;
+
+    ctx.strokeRect(b.x, b.y, b.w, b.h);
+  });
+}
+
+function next() {
+  current = (current + 1) % dataset.length;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  loadImage();
+}
+
+function convertBBox(box, img) {
+  const scaleX = img.clientWidth;
+  const scaleY = img.clientHeight;
+
+  const boxW = box.w * scaleX;
+  const boxH = box.h * scaleY;
+
+  const boxX = (box.x * scaleX) - boxW / 2;
+  const boxY = (box.y * scaleY) - boxH / 2;
+
+  return {
+    x: boxX,
+    y: boxY,
+    w: boxW,
+    h: boxH
+  };
+}
+  
 /* CHART */
 const ctx = document.getElementById('classChart');
 
@@ -426,6 +545,8 @@ new Chart(ctx, {
     }
   }
 });
+
+loadImage();
 </script>
 </body>
 </html>
