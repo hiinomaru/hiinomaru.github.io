@@ -555,33 +555,6 @@ function drawImage() {
   ctx.restore();
 }
 
-/**
- * YOLO bbox → rotated canvas coordinates
- */
-function transformBBox(box, imgW, imgH) {
-  // original pixel coords
-  let x = box.x * imgW;
-  let y = box.y * imgH;
-  let w = box.w * imgW;
-  let h = box.h * imgH;
-
-  // rotate 90° clockwise (same as image)
-  return {
-    x: y,
-    y: imgW - x - w,
-    w: h,
-    h: w
-  };
-}
-
-function rotatePoint90(x, y, w, h) {
-  // rotate clockwise 90° around origin (0,0)
-  return {
-    x: y,
-    y: w - x
-  };
-}
-
 function showBBox() {
   if (!currentImage) return;
 
@@ -591,51 +564,35 @@ function showBBox() {
   const imgW = currentImage.naturalWidth;
   const imgH = currentImage.naturalHeight;
 
-  const canvasW = canvas.width;
-  const canvasH = canvas.height;
-
   ctx.save();
 
-  // canvas transform (ONLY for image reference, NOT bbox drawing)
-  const rotatedW = imgH;
-  const rotatedH = imgW;
-
-  const scale = Math.min(canvasW / rotatedW, canvasH / rotatedH);
-
-  const drawW = rotatedW * scale;
-  const drawH = rotatedH * scale;
-
-  const offsetX = (canvasW - drawW) / 2;
-  const offsetY = (canvasH - drawH) / 2;
+  // SAME transform as image
+  ctx.translate(transform.offsetX, transform.offsetY);
+  ctx.translate(transform.drawW / 2, transform.drawH / 2);
+  ctx.rotate(Math.PI / 2);
 
   item.bboxes.forEach(box => {
 
-    // YOLO → image pixels
+    // YOLO → pixel space
     let x = box.x * imgW;
     let y = box.y * imgH;
     let w = box.w * imgW;
     let h = box.h * imgH;
 
-    // convert to corner
+    // convert center → top-left
     let x1 = x - w / 2;
     let y1 = y - h / 2;
 
-    // ROTATE POINTS MANUALLY (NO ctx.rotate)
-    let rx = y1;
-    let ry = imgW - x1 - w;
-
-    // swap w/h after rotation
-    let rw = h;
-    let rh = w;
-
-    // map to canvas space
-    const cx = offsetX + (drawW - rx * scale);
-    const cy = offsetY + (drawH - ry * scale);
-
+    // draw in SAME rotated space
     ctx.strokeStyle = classColors[box.class_id] || "red";
     ctx.lineWidth = 3;
 
-    ctx.strokeRect(cx, cy, rw * scale, rh * scale);
+    ctx.strokeRect(
+      x1 - imgW / 2,
+      y1 - imgH / 2,
+      w,
+      h
+    );
   });
 
   ctx.restore();
