@@ -66,7 +66,7 @@ h1, h2, h3 {
   box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
-/* IMAGE BOX (КЛЮЧЕВАЯ ЧАСТЬ) */
+/* IMAGE BOX */
 .image-box {
   width: 100%;
   height: 260px;
@@ -85,26 +85,53 @@ h1, h2, h3 {
   object-fit: contain;
 }
 
-/* optional rotations */
-.rotate-left {
-  transform: rotate(-90deg);
-}
-
-.rotate-right {
+/* ROTATION */
+.rotate-90 {
   transform: rotate(90deg);
 }
 
-/* PIPELINE */
+/* =========================
+   🔥 NEW PIPELINE (CLEAN UI)
+   ========================= */
+
 .pipeline {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
   margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.step {
+  background: #1e293b;
+  padding: 14px 18px;
+  border-radius: 12px;
+  min-width: 130px;
   text-align: center;
+  transition: 0.3s;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.step:hover {
+  transform: translateY(-5px);
+  background: #273449;
+}
+
+.icon {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: bold;
+  opacity: 0.9;
 }
 
 .arrow {
-  align-self: center;
-  font-size: 24px;
+  font-size: 22px;
+  opacity: 0.6;
 }
 
 /* BUTTONS */
@@ -127,6 +154,14 @@ button {
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .pipeline {
+    flex-direction: column;
+  }
+
+  .arrow {
+    transform: rotate(90deg);
   }
 }
 </style>
@@ -183,14 +218,35 @@ button {
 <div id="how" class="section">
   <h2>How it works</h2>
 
+  <!-- 🔥 NEW PIPELINE -->
   <div class="pipeline">
-    <div>📷 Image</div>
+
+    <div class="step">
+      <div class="icon">📷</div>
+      <div class="label">Image</div>
+    </div>
+
     <div class="arrow">→</div>
-    <div>⚙️ Processing</div>
+
+    <div class="step">
+      <div class="icon">⚙️</div>
+      <div class="label">Processing</div>
+    </div>
+
     <div class="arrow">→</div>
-    <div>🤖 Model</div>
+
+    <div class="step">
+      <div class="icon">🤖</div>
+      <div class="label">Model</div>
+    </div>
+
     <div class="arrow">→</div>
-    <div>✅ Result</div>
+
+    <div class="step">
+      <div class="icon">✅</div>
+      <div class="label">Result</div>
+    </div>
+
   </div>
 
   <div class="grid">
@@ -207,7 +263,7 @@ button {
       <h3>Preprocessing</h3>
       <p>Augmentations improve robustness.</p>
       <div class="image-box">
-        <img src="images/i2.png">
+        <img src="images/i2.png" class="rotate-90">
       </div>
     </div>
 
