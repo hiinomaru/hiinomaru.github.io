@@ -247,6 +247,8 @@ button {
   </div>
 </div>
 
+<div id="result" class="result"></div>
+
 <!-- WHY -->
 <div id="why" class="section">
   <h2>Why it matters</h2>
@@ -636,7 +638,6 @@ canvas.addEventListener("mouseup", (e) => {
 
   isDrawing = false;
 
-  showBBox();
   drawPlayerBox();
   evaluate();
 });
@@ -702,12 +703,14 @@ function evaluate() {
     best = Math.max(best, iou(playerBox, g));
   }
 
-  console.log("IoU:", best);
+  const resultEl = document.getElementById("result");
 
   if (best > 0.5) {
-    console.log("✅ correct");
+    resultEl.innerHTML = `✅ Correct! IoU: ${best.toFixed(2)}`;
+    resultEl.style.color = "lime";
   } else {
-    console.log("❌ wrong");
+    resultEl.innerHTML = `❌ Wrong. IoU: ${best.toFixed(2)}`;
+    resultEl.style.color = "red";
   }
 }
   
