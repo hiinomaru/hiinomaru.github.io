@@ -245,9 +245,11 @@ button {
     <button onclick="showBBox()">Show Answer</button>
     <button onclick="next()">Next</button>
   </div>
-</div>
 
-<div id="result" class="result"></div>
+  <div id="result" class="result"></div>
+
+  <div id="debug" class="result"></div>
+</div>
 
 <!-- WHY -->
 <div id="why" class="section">
@@ -560,7 +562,7 @@ function drawImage() {
 function showBBox() {
   if (!currentImage) return;
 
-  drawImage();
+  //drawImage();
 
   const item = dataset[current];
   const imgW = currentImage.naturalWidth;
@@ -638,7 +640,7 @@ canvas.addEventListener("mouseup", (e) => {
 
   isDrawing = false;
 
-  drawPlayerBox();
+  render();
   evaluate();
 });
 
@@ -704,6 +706,18 @@ function evaluate() {
   }
 
   const resultEl = document.getElementById("result");
+  const debugEl = document.getElementById("debug");
+
+  const gtStr = gt.map(g =>
+    `GT: (${g.x1.toFixed(1)}, ${g.y1.toFixed(1)}, ${g.x2.toFixed(1)}, ${g.y2.toFixed(1)})`
+  ).join("<br>");
+
+  const pb = playerBox;
+
+  const playerStr =
+    `PLAYER: (${pb.x1.toFixed(1)}, ${pb.y1.toFixed(1)}, ${pb.x2.toFixed(1)}, ${pb.y2.toFixed(1)})`;
+
+  debugEl.innerHTML = `${playerStr}<br>${gtStr}`;
 
   if (best > 0.5) {
     resultEl.innerHTML = `✅ Correct! IoU: ${best.toFixed(2)}`;
@@ -712,6 +726,12 @@ function evaluate() {
     resultEl.innerHTML = `❌ Wrong. IoU: ${best.toFixed(2)}`;
     resultEl.style.color = "red";
   }
+}
+
+function render() {
+  drawImage();
+  showBBox();
+  drawPlayerBox();
 }
   
 /* CHART */
