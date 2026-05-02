@@ -469,6 +469,12 @@ function showBBox() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  ctx.save();
+
+  // 👉 вращаем canvas
+  ctx.translate(canvas.width, 0);
+  ctx.rotate(Math.PI / 2);
+
   item.bboxes.forEach(box => {
     const b = convertBBox(box, img);
 
@@ -477,6 +483,8 @@ function showBBox() {
 
     ctx.strokeRect(b.x, b.y, b.w, b.h);
   });
+
+  ctx.restore();
 }
 
 function next() {
@@ -492,14 +500,14 @@ function convertBBox(box, img) {
   const boxW = box.w * scaleX;
   const boxH = box.h * scaleY;
 
-  const boxX = (box.x * scaleX) - boxW / 2;
-  const boxY = (box.y * scaleY) - boxH / 2;
+  let boxX = (box.x * scaleX) - boxW / 2;
+  let boxY = (box.y * scaleY) - boxH / 2;
 
   return {
-    x: boxX,
-    y: boxY,
-    w: boxW,
-    h: boxH
+    x: boxY,
+    y: scaleX - boxX - boxW,
+    w: boxH,
+    h: boxW
   };
 }
   
