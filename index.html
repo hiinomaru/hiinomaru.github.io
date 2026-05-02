@@ -214,7 +214,7 @@ button {
   <h1>Bone Fracture Detection</h1>
   <p style="text-align:center;">Can you detect fractures better than AI?</p>
 
-  <div style="position:relative; display:inline-block;">
+  <div style="position:relative; display:inline-block; overflow:hidden;">
     <img id="img" class="rotate-90" style="max-width:500px;">
     <canvas id="canvas" style="position:absolute; left:0; top:0;"></canvas>
   </div>
@@ -461,6 +461,9 @@ function loadImage() {
   img.onload = () => {
     canvas.width = img.clientHeight;
     canvas.height = img.clientWidth;
+
+    canvas.style.width = img.clientHeight + "px";
+    canvas.style.height = img.clientWidth + "px";
   };
 }
 
@@ -499,8 +502,8 @@ function convertBBox(box, img) {
   const boxW = box.w * scaleX;
   const boxH = box.h * scaleY;
 
-  let boxX = (box.x * scaleX) - boxW / 2;
-  let boxY = (box.y * scaleY) - boxH / 2;
+  const boxX = (box.x * scaleX) - boxW / 2;
+  const boxY = (box.y * scaleY) - boxH / 2;
 
   return {
     x: boxY,
