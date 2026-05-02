@@ -39,12 +39,14 @@ body {
 /* SECTIONS */
 .section {
   padding: 60px 20px;
+  font-size: 36px;
   max-width: 1100px;
   margin: auto;
 }
 
 .section h2 {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  font-size: 28px;
 }
 
 h1, h2, h3 {
@@ -170,6 +172,22 @@ button {
 <!-- DEMO -->
 <div id="demo" class="section">
   <h1>Bone Fracture Detection</h1>
+  <p style="text-align:center;">Can you detect fractures better than AI?</p>
+
+  <input type="file" id="upload">
+  <img id="preview" style="display:none; max-width:300px; margin:20px auto; display:block;">
+
+  <div style="text-align:center;">
+    <button onclick="answer('fracture')">Fracture</button>
+    <button onclick="answer('no')">No Fracture</button>
+  </div>
+
+  <div class="result" id="result"></div>
+</div>
+
+<!-- DEMO -->
+<div id="demo" class="section">
+  <h1>Why</h1>
   <p style="text-align:center;">Can you detect fractures better than AI?</p>
 
   <input type="file" id="upload">
