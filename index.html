@@ -442,6 +442,7 @@ const dataset = [
 ]
 
 let current = 0;
+let currentImage = null;
 
 const img = document.getElementById("img");
 const canvas = document.getElementById("canvas");
@@ -460,6 +461,7 @@ function loadImage() {
   image.src = "images/" + item.img.replace(".txt", ".png");
 
   image.onload = () => {
+    currentImage = image; // ✅ сохраняем
 
     const w = image.naturalWidth;
     const h = image.naturalHeight;
@@ -470,47 +472,47 @@ function loadImage() {
     canvas.style.width = h + "px";
     canvas.style.height = w + "px";
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.save();
-    ctx.translate(canvas.width, 0);
-    ctx.rotate(Math.PI / 2);
-    ctx.drawImage(image, 0, 0, w, h);
-    ctx.restore();
+    drawImage();
   };
+}
+
+function drawImage() {
+  if (!currentImage) return;
+
+  const w = currentImage.naturalWidth;
+  const h = currentImage.naturalHeight;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.translate(canvas.width, 0);
+  ctx.rotate(Math.PI / 2);
+  ctx.drawImage(currentImage, 0, 0, w, h);
+  ctx.restore();
 }
 
 function showBBox() {
   const item = dataset[current];
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawImage();
 
-  const image = new Image();
-  image.src = img.src;
+  const w = currentImage.naturalWidth;
+  const h = currentImage.naturalHeight;
 
-  image.onload = () => {
+  ctx.save();
+  ctx.translate(canvas.width, 0);
+  ctx.rotate(Math.PI / 2);
 
-    const w = image.naturalWidth;
-    const h = image.naturalHeight;
+  item.bboxes.forEach(box => {
+    const b = convertBBox(box, w, h);
 
-    ctx.save();
+    ctx.strokeStyle = classColors[box.class_id] || "red";
+    ctx.lineWidth = 3;
 
-    ctx.translate(canvas.width, 0);
-    ctx.rotate(Math.PI / 2);
+    ctx.strokeRect(b.x, b.y, b.w, b.h);
+  });
 
-    ctx.drawImage(image, 0, 0, w, h);
-
-    item.bboxes.forEach(box => {
-      const b = convertBBox(box, w, h);
-
-      ctx.strokeStyle = classColors[box.class_id] || "red";
-      ctx.lineWidth = 3;
-
-      ctx.strokeRect(b.x, b.y, b.w, b.h);
-    });
-
-    ctx.restore();
-  };
+  ctx.restore();
 }
 
 function next() {
