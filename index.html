@@ -128,6 +128,22 @@ h3 {
   justify-content: center;
 }
 
+.viewer {
+  width: 700px;
+  height: 700px;
+  margin: 30px auto;
+  background: #020617;
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+canvas {
+  display: block;
+}
+
 .image-box img {
   width: 100%;
   height: 100%;
@@ -214,10 +230,9 @@ button {
   <h1>Bone Fracture Detection</h1>
   <p style="text-align:center;">Can you detect fractures better than AI?</p>
 
-  <div style="display:flex; justify-content:center; align-items:center; margin-top:30px;">
-    <img id="img" style="max-width:500px;">
-    <canvas id="canvas"></canvas>
-  </div>
+  <div class="viewer">
+  <canvas id="canvas"></canvas>
+</div>
 
   <div style="text-align:center; margin-top:20px;">
     <button onclick="showBBox()">Show Answer</button>
@@ -444,7 +459,7 @@ const dataset = [
 let current = 0;
 let currentImage = null;
 
-const img = document.getElementById("img");
+//const img = document.getElementById("img");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -461,13 +476,13 @@ function loadImage() {
   image.src = "images/" + item.img.replace(".txt", ".png");
 
   image.onload = () => {
-    currentImage = image; // ✅ сохраняем
+    currentImage = image;
 
     const w = image.naturalWidth;
     const h = image.naturalHeight;
 
-    canvas.width = h;
-    canvas.height = w;
+    canvas.width = 700;
+    canvas.height = 700;
 
     canvas.style.width = h + "px";
     canvas.style.height = w + "px";
