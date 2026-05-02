@@ -214,8 +214,8 @@ button {
   <h1>Bone Fracture Detection</h1>
   <p style="text-align:center;">Can you detect fractures better than AI?</p>
 
-  <div style="position:relative; display:inline-block; overflow:hidden;">
-    <img id="img" class="rotate-90" style="max-width:500px;">
+  <div style="position:relative; display:flex; justify-content:center; align-items:center; margin-top:30px;">
+    <img id="img" style="max-width:500px;">
     <canvas id="canvas" style="position:absolute; left:0; top:0;"></canvas>
   </div>
 
@@ -459,11 +459,17 @@ function loadImage() {
   img.src = "images/" + item.img.replace(".txt", ".png");
 
   img.onload = () => {
-    canvas.width = img.clientHeight;
-    canvas.height = img.clientWidth;
 
-    canvas.style.width = img.clientHeight + "px";
-    canvas.style.height = img.clientWidth + "px";
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
+
+    canvas.width = h;
+    canvas.height = w;
+
+    canvas.style.width = h + "px";
+    canvas.style.height = w + "px";
+
+    img.style.display = "none"; // скрываем оригинал
   };
 }
 
@@ -472,21 +478,32 @@ function showBBox() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.save();
+  const image = new Image();
+  image.src = img.src;
 
-  ctx.translate(canvas.width, 0);
-  ctx.rotate(Math.PI / 2);
+  image.onload = () => {
 
-  item.bboxes.forEach(box => {
-    const b = convertBBox(box, img);
+    const w = image.naturalWidth;
+    const h = image.naturalHeight;
 
-    ctx.strokeStyle = classColors[box.class_id] || "red";
-    ctx.lineWidth = 3;
+    ctx.save();
 
-    ctx.strokeRect(b.x, b.y, b.w, b.h);
-  });
+    ctx.translate(canvas.width, 0);
+    ctx.rotate(Math.PI / 2);
 
-  ctx.restore();
+    ctx.drawImage(image, 0, 0, w, h);
+
+    item.bboxes.forEach(box => {
+      const b = convertBBox(box, w, h);
+
+      ctx.strokeStyle = classColors[box.class_id] || "red";
+      ctx.lineWidth = 3;
+
+      ctx.strokeRect(b.x, b.y, b.w, b.h);
+    });
+
+    ctx.restore();
+  };
 }
 
 function next() {
@@ -495,21 +512,19 @@ function next() {
   loadImage();
 }
 
-function convertBBox(box, img) {
-  const scaleX = img.clientWidth;
-  const scaleY = img.clientHeight;
+function convertBBox(box, w, h) {
 
-  const boxW = box.w * scaleX;
-  const boxH = box.h * scaleY;
+  const boxW = box.w * w;
+  const boxH = box.h * h;
 
-  const boxX = (box.x * scaleX) - boxW / 2;
-  const boxY = (box.y * scaleY) - boxH / 2;
+  const boxX = (box.x * w) - boxW / 2;
+  const boxY = (box.y * h) - boxH / 2;
 
   return {
-    x: boxY,
-    y: scaleX - boxX - boxW,
-    w: boxH,
-    h: boxW
+    x: boxX,
+    y: boxY,
+    w: boxW,
+    h: boxH
   };
 }
   
