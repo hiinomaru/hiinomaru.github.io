@@ -629,8 +629,8 @@ function showBBox() {
     let rh = w;
 
     // map to canvas space
-    const cx = offsetX + rx * scale;
-    const cy = offsetY + ry * scale;
+    const cx = offsetX + (drawW - rx * scale);
+    const cy = offsetY + (drawH - ry * scale);
 
     ctx.strokeStyle = classColors[box.class_id] || "red";
     ctx.lineWidth = 3;
