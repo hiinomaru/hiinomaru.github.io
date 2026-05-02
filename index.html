@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bone Fracture Detection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 40px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #3b82f6;
+      border: none;
+      color: white;
+      border-radius: 6px;
+    }
+    img {
+      max-width: 100%;
+      margin-top: 20px;
+      border-radius: 10px;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Bone Fracture Detection</h1>
+  <p>Can you detect fractures better than AI?</p>
+
+  <input type="file" id="upload" accept="image/*">
+  <br>
+  <img id="preview" style="display:none;">
+
+  <div>
+    <button onclick="answer('fracture')">Fracture</button>
+    <button onclick="answer('no')">No Fracture</button>
+  </div>
+
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+  let correctAnswer = "fracture"; // demo answer
+
+  const upload = document.getElementById("upload");
+  const preview = document.getElementById("preview");
+
+  upload.onchange = () => {
+    const file = upload.files[0];
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+  };
+
+  function answer(userAnswer) {
+    const result = document.getElementById("result");
+
+    if (userAnswer === correctAnswer) {
+      result.innerHTML = "✅ Correct!";
+    } else {
+      result.innerHTML = "❌ Wrong! AI says: " + correctAnswer;
+    }
+  }
+</script>
+
+</body>
+</html>
