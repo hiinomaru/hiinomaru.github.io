@@ -157,50 +157,73 @@ img {
   </div>
 </div>
 
-<!-- HOW IT WORKS -->
+<!-- HOW -->
 <div id="how" class="section">
   <h2>How it works</h2>
 
   <div class="pipeline">
-    <div class="step">📷<br>Image</div>
+    <div>📷 Image</div>
     <div class="arrow">→</div>
-    <div class="step">⚙️<br>Processing</div>
+    <div>⚙️ Processing</div>
     <div class="arrow">→</div>
-    <div class="step">🤖<br>AI Model</div>
+    <div>🤖 Model</div>
     <div class="arrow">→</div>
-    <div class="step">✅<br>Result</div>
+    <div>✅ Result</div>
   </div>
 
-  <div class="cards" style="margin-top:50px;">
-    
-    <div class="card">
-      <h3>Dataset</h3>
-      <p>Trained on thousands of annotated X-ray images.</p>
-    </div>
+  <!-- DATASET -->
+  <h3>Dataset</h3>
+  <p>
+    We used the <b>GRAZPEDWRI-DX</b> dataset containing over 20,000 X-ray images 
+    annotated by medical experts with bounding boxes.
+  </p>
+  <img src="images/i7.png">
 
-    <div class="card">
-      <h3>Preprocessing</h3>
-      <p>Images are enhanced and augmented to improve robustness.</p>
-    </div>
+  <!-- PREPROCESSING -->
+  <h3>Preprocessing</h3>
+  <p>
+    Images were converted into YOLO format and enhanced using medical augmentations 
+    to improve model robustness.
+  </p>
+  <ul>
+    <li>Brightness & contrast adjustment</li>
+    <li>Noise injection</li>
+    <li>Rotation & flipping</li>
+    <li>CLAHE enhancement</li>
+  </ul>
+  <img src="images/i2.png">
 
-    <div class="card">
-      <h3>Model</h3>
-      <p>Deep learning model detects fractures and localizes them.</p>
-    </div>
+  <!-- MODEL -->
+  <h3>Model 1: YOLOv8</h3>
+  <p>
+    Fast and accurate detection model with strong localization performance.
+  </p>
+  <img src="images/i5.png">
 
-    <div class="card">
-      <h3>Model Comparison</h3>
-      <p>Different models were tested to balance accuracy and reliability.</p>
-    </div>
+  <h3>Model 2: YOLOv11</h3>
+  <p>
+    Improved recall and better detection of subtle fractures.
+  </p>
+  <img src="images/i6.png">
 
-    <div class="card">
-      <h3>Results</h3>
-      <p>High accuracy on common cases, challenges remain for rare fractures.</p>
-    </div>
+  <!-- RESULTS -->
+  <h3>Results</h3>
+  <p>
+    The models achieved strong performance across key metrics:
+  </p>
 
+  <ul>
+    <li>mAP: ~0.71</li>
+    <li>Recall: up to 0.89</li>
+    <li>F1 Score: ~0.72</li>
+  </ul>
+
+  <div class="cards">
+    <img src="images/i5.png">
+    <img src="images/i6.png">
   </div>
+
 </div>
-
 <script>
 let correctAnswer = "fracture";
 
