@@ -648,24 +648,29 @@ function canvasToImage(box) {
   const imgW = currentImage.naturalWidth;
   const imgH = currentImage.naturalHeight;
 
-  // 1. undo canvas scale + offset
-  let x1 = (box.x1 - transform.offsetX);
-  let y1 = (box.y1 - transform.offsetY);
-  let x2 = (box.x2 - transform.offsetX);
-  let y2 = (box.y2 - transform.offsetY);
+  const cx = transform.offsetX + transform.drawW / 2;
+  const cy = transform.offsetY + transform.drawH / 2;
 
-  // 2. undo scale
-  x1 /= transform.scale;
-  y1 /= transform.scale;
-  x2 /= transform.scale;
-  y2 /= transform.scale;
+  // 1. move to center-based system
+  let x1 = box.x1 - cx;
+  let y1 = box.y1 - cy;
+  let x2 = box.x2 - cx;
+  let y2 = box.y2 - cy;
 
-  // 3. undo rotation (90° CCW inverse = -90°)
+  // 2. inverse rotate -90°
+  const ix1 = y1;
+  const iy1 = -x1;
+  const ix2 = y2;
+  const iy2 = -x2;
+
+  // 3. move back to image pixel scale
+  const scale = transform.scale;
+
   return {
-    x1: y1,
-    y1: imgW - x2,
-    x2: y2,
-    y2: imgW - x1
+    x1: (ix1 / scale) + imgW / 2,
+    y1: (iy1 / scale) + imgH / 2,
+    x2: (ix2 / scale) + imgW / 2,
+    y2: (iy2 / scale) + imgH / 2
   };
 }
 
