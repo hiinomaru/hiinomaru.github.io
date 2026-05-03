@@ -696,10 +696,10 @@ function gtToCanvasSpace(box) {
   // значит координаты тоже уже "после rotate"
 
   return {
-    x1: cx + (y - h / 2) * scale,
-    y1: cy + (imgW - x - w / 2) * scale,
-    x2: cx + (y + h / 2) * scale,
-    y2: cy + (imgW - x + w / 2) * scale
+    x1: transform.offsetX + transform.drawW - (cx + (y - h / 2) * scale),
+    y1: transform.offsetY + transform.drawH - (cy + (imgW - x - w / 2) * scale),
+    x2: transform.offsetX + transform.drawW - (cx + (y + h / 2) * scale),
+    y2: transform.offsetY + transform.drawH - (cy + (imgW - x + w / 2) * scale)
   };
 }
 
