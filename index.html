@@ -687,8 +687,8 @@ function gtToCanvasSpace(box) {
   let h = box.h * imgH;
 
   // image → rotated (90° clockwise)
-  let rx = y;
-  let ry = imgW - x;
+  let rx = imgH - y;
+  let ry = x;
   let rw = h;
   let rh = w;
 
