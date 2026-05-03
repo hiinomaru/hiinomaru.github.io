@@ -686,16 +686,20 @@ function gtToCanvasSpace(box) {
   let w = box.w * imgW;
   let h = box.h * imgH;
 
-  // 👉 ВОТ ТВОЙ 180° (если он реально нужен)
-  x = imgW - x;
-  y = imgH - y;
+  // image → canvas rotated space (SAME as drawImage transform)
+  const scale = transform.scale;
 
-  // image → canvas (ONLY scale + offset, NO ROTATION LOGIC HERE)
+  const cx = transform.offsetX;
+  const cy = transform.offsetY;
+
+  // ВАЖНО: ты уже РИСУЕШЬ rotated image,
+  // значит координаты тоже уже "после rotate"
+
   return {
-    x1: transform.offsetX + (x - w / 2) * transform.scale,
-    y1: transform.offsetY + (y - h / 2) * transform.scale,
-    x2: transform.offsetX + (x + w / 2) * transform.scale,
-    y2: transform.offsetY + (y + h / 2) * transform.scale
+    x1: cx + (y - h / 2) * scale,
+    y1: cy + (imgW - x - w / 2) * scale,
+    x2: cx + (y + h / 2) * scale,
+    y2: cy + (imgW - x + w / 2) * scale
   };
 }
 
