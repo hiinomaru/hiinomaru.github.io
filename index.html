@@ -644,36 +644,6 @@ canvas.addEventListener("mouseup", (e) => {
   evaluate();
 });
 
-function canvasToImage(box) {
-  const imgW = currentImage.naturalWidth;
-  const imgH = currentImage.naturalHeight;
-
-  const cx = transform.offsetX + transform.drawW / 2;
-  const cy = transform.offsetY + transform.drawH / 2;
-
-  // 1. move to center-based system
-  let x1 = box.x1 - cx;
-  let y1 = box.y1 - cy;
-  let x2 = box.x2 - cx;
-  let y2 = box.y2 - cy;
-
-  // 2. inverse rotate -90°
-  const ix1 = y1;
-  const iy1 = -x1;
-  const ix2 = y2;
-  const iy2 = -x2;
-
-  // 3. move back to image pixel scale
-  const scale = transform.scale;
-
-  return {
-    x1: (ix1 / scale) + imgW / 2,
-    y1: (iy1 / scale) + imgH / 2,
-    x2: (ix2 / scale) + imgW / 2,
-    y2: (iy2 / scale) + imgH / 2
-  };
-}
-
 function drawPlayerBox() {
   if (!playerBox) return;
 
@@ -706,58 +676,50 @@ function iou(a, b) {
   return inter / (areaA + areaB - inter);
 }
 
-function gtToCanvas(box, imgW, imgH) {
-  const x = box.x * imgW;
-  const y = box.y * imgH;
-  const w = box.w * imgW;
-  const h = box.h * imgH;
+function gtToCanvasSpace(box) {
+  const imgW = currentImage.naturalWidth;
+  const imgH = currentImage.naturalHeight;
 
+  // YOLO → image
+  let x = box.x * imgW;
+  let y = box.y * imgH;
+  let w = box.w * imgW;
+  let h = box.h * imgH;
+
+  // image → rotated (90° clockwise)
+  let rx = y;
+  let ry = imgW - x;
+  let rw = h;
+  let rh = w;
+
+  // rotated image → canvas
   return {
-    x1: x - w / 2,
-    y1: y - h / 2,
-    x2: x + w / 2,
-    y2: y + h / 2
+    x1: transform.offsetX + (rx - rw / 2) * transform.scale,
+    y1: transform.offsetY + (ry - rh / 2) * transform.scale,
+    x2: transform.offsetX + (rx + rw / 2) * transform.scale,
+    y2: transform.offsetY + (ry + rh / 2) * transform.scale
   };
 }
 
 function evaluate() {
   const item = dataset[current];
 
-  const imgW = currentImage.naturalWidth;
-  const imgH = currentImage.naturalHeight;
-
-  // GT in image space
-  const gt = item.bboxes.map(b => {
-    const x = b.x * imgW;
-    const y = b.y * imgH;
-    const w = b.w * imgW;
-    const h = b.h * imgH;
-
-    return {
-      x1: x - w / 2,
-      y1: y - h / 2,
-      x2: x + w / 2,
-      y2: y + h / 2
-    };
-  });
-
   if (!playerBox) return;
 
-  // PLAYER → IMAGE SPACE
-  const p = canvasToImage(playerBox);
+  const gt = item.bboxes.map(gtToCanvasSpace);
 
   let best = 0;
 
   for (const g of gt) {
-    best = Math.max(best, iou(p, g));
+    best = Math.max(best, iou(playerBox, g));
   }
 
   const resultEl = document.getElementById("result");
   const debugEl = document.getElementById("debug");
 
   debugEl.innerHTML = `
-    PLAYER (img space): ${JSON.stringify(p)} <br>
-    GT0: ${JSON.stringify(gt[0])}
+    PLAYER: ${JSON.stringify(playerBox)} <br>
+    GT: ${JSON.stringify(gt[0])}
   `;
 
   if (best > 0.5) {
